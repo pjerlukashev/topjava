@@ -32,8 +32,9 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public void update(Meal meal) {ValidationUtil.checkNotFoundWithId(repository.save(meal), meal.getId());
-
+    public void update(Meal meal) {
+        if(meal!= null)
+        ValidationUtil.checkNotFoundWithId(repository.save(meal), meal.getId());
     }
 
     @Override

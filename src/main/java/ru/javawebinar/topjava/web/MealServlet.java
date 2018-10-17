@@ -29,8 +29,7 @@ import static ru.javawebinar.topjava.web.SecurityUtil.authUserCaloriesPerDay;
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
 
-        private static int authUserId =  SecurityUtil.authUserId();
-          private static int authCaloriesPerDay = authUserCaloriesPerDay();
+
         private static   MealRestController   mealRestController;
       private static   ConfigurableApplicationContext appCtx;
 
@@ -48,11 +47,10 @@ public class MealServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         String id = request.getParameter("id");
-
         Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
-                Integer.parseInt(request.getParameter("calories")),authUserId);
+                Integer.parseInt(request.getParameter("calories")),SecurityUtil.authUserId());
 
         log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
        if( meal.getId()==null) mealRestController.create(meal) ;
@@ -69,22 +67,23 @@ public class MealServlet extends HttpServlet {
             case "delete":
                 int id = getId(request);
                 log.info("Delete {}", id);
-                mealRestController.delete(id, authUserId);
+                mealRestController.delete(id, SecurityUtil.authUserId());
                 response.sendRedirect("meals");
                 break;
             case "create":
             case "update":
                 final Meal meal = "create".equals(action) ?
-                        new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000, authUserId) :
-                        mealRestController.get(getId(request), authUserId);
+                        new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000, SecurityUtil.authUserId()) :
+                        mealRestController.get(getId(request), SecurityUtil.authUserId());
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
                 break;
             case "all":
             default:
                 log.info("getAll");
+                log.info("Getting meals for user with id" + SecurityUtil.authUserId() );
                 request.setAttribute("meals",
-                        mealRestController.getAll(authUserId, authCaloriesPerDay ));
+                        mealRestController.getAll(SecurityUtil.authUserId(), SecurityUtil.authUserCaloriesPerDay() ));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }
