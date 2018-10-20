@@ -8,6 +8,8 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealWithExceed;
 import ru.javawebinar.topjava.util.MealsUtil;
+import ru.javawebinar.topjava.util.exception.NotFoundException;
+import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -24,35 +26,37 @@ public class MealRestController {
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
- public List<MealWithExceed> getAll(int userId, int caloriesPerDay){
+ public List<MealWithExceed> getAll(){
      log.info("get all");
-    return MealsUtil.getWithExceeded(service.getAll(userId), caloriesPerDay);
+    return MealsUtil.getWithExceeded(service.getAll(SecurityUtil.authUserId()), SecurityUtil.authUserCaloriesPerDay());
  }
 
-    public List<MealWithExceed> getAllFiltered(int userId, int caloriesPerDay, LocalTime startTime, LocalTime endTime){
+    public List<MealWithExceed> getAllFiltered(LocalTime startTime, LocalTime endTime){
         log.info("get all filtered");
-        return MealsUtil.getFilteredWithExceeded(service.getAll(userId), caloriesPerDay,startTime, endTime);
+        return MealsUtil.getFilteredWithExceeded(service.getAll(SecurityUtil.authUserId()), SecurityUtil.authUserCaloriesPerDay(),startTime, endTime);
     }
 
-    public Meal get(int id, int userId){
+    public Meal get(int id) throws NotFoundException {
         log.info("get meal");
-        return service.get(id, userId);
+        return service.get(id, SecurityUtil.authUserId());
     }
 
-    public Meal create(Meal meal) {
+    public Meal create(Meal meal) throws NotFoundException {
         log.info("create {}", meal);
         checkNew(meal);
+        meal.setUserId(SecurityUtil.authUserId());
         return service.create(meal);
     }
 
-    public void delete(int id, int userId) {
+    public void delete(int id) throws NotFoundException {
         log.info("delete {}", id);
-        service.delete(id, userId);
+        service.delete(id, SecurityUtil.authUserId());
     }
 
-    public void update(Meal meal, int id) {
+    public void update(Meal meal, int id) throws NotFoundException {
         log.info("update {} with id={}", meal, id);
         assureIdConsistent(meal, id);
+        meal.setUserId(SecurityUtil.authUserId());
         service.update(meal);
     }
 

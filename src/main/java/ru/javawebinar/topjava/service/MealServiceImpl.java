@@ -32,7 +32,7 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public void update(Meal meal) {
+    public void update(Meal meal) throws NotFoundException {
         if(meal!= null)
         ValidationUtil.checkNotFoundWithId(repository.save(meal), meal.getId());
     }

@@ -67,14 +67,14 @@ public class MealServlet extends HttpServlet {
             case "delete":
                 int id = getId(request);
                 log.info("Delete {}", id);
-                mealRestController.delete(id, SecurityUtil.authUserId());
+                mealRestController.delete(id);
                 response.sendRedirect("meals");
                 break;
             case "create":
             case "update":
                 final Meal meal = "create".equals(action) ?
                         new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000, SecurityUtil.authUserId()) :
-                        mealRestController.get(getId(request), SecurityUtil.authUserId());
+                        mealRestController.get(getId(request));
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
                 break;
@@ -83,7 +83,7 @@ public class MealServlet extends HttpServlet {
                 log.info("getAll");
                 log.info("Getting meals for user with id" + SecurityUtil.authUserId() );
                 request.setAttribute("meals",
-                        mealRestController.getAll(SecurityUtil.authUserId(), SecurityUtil.authUserCaloriesPerDay() ));
+                        mealRestController.getAll());
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }
