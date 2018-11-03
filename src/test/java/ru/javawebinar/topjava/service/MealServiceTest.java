@@ -56,6 +56,15 @@ public class MealServiceTest {
         SLF4JBridgeHandler.install();
     }
 
+    @AfterClass
+    public static void printResult() {
+        log.info("\n---------------------------------" +
+                "\nTest                 Duration, ms" +
+                "\n---------------------------------" +
+                results +
+                "\n---------------------------------");
+    }
+
        @Autowired
     private MealService service;
 
