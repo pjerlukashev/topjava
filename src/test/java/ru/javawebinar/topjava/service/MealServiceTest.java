@@ -32,13 +32,13 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
         "classpath:spring/spring-app.xml",
         "classpath:spring/spring-db.xml"
 })
-@RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
+@RunWith(SpringRunner.class)
 @ActiveProfiles(resolver = ActiveDbProfileResolver.class)
-public class MealServiceTest {
-    private static final Logger log = getLogger("result");
+public abstract class MealServiceTest {
+    protected static final Logger log = getLogger("result");
 
-    private static StringBuilder results = new StringBuilder();
+    protected static StringBuilder results = new StringBuilder();
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -69,7 +69,7 @@ public class MealServiceTest {
     }
 
        @Autowired
-    private MealService service;
+    public MealService service;
 
     @Test
     public void delete() throws Exception {
