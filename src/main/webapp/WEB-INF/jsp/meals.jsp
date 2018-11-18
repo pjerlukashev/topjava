@@ -5,12 +5,12 @@
 <html>
 <head>
     <title>Calories management</title>
-    <link rel="stylesheet" href="css/style.css">
+   <%-- <link rel="stylesheet" href="css/style.css">--%>
 </head>
 <body>
 <section>
     <h3>Meals</h3>
-    <form method="post" action="/filter">
+    <form method="post" action="meals/filter">
         <dl>
             <dt>From Date:</dt>
             <dd><input type="date" name="startDate" value="${param.startDate}"></dd>
@@ -30,7 +30,7 @@
         <button type="submit">Filter</button>
     </form>
     <hr/>
-    <a href="/create">Add Meal</a>
+    <a href="meals/create">Add Meal</a>
     <hr/>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>

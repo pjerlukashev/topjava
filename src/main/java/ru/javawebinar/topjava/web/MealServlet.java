@@ -1,3 +1,4 @@
+/*
 package ru.javawebinar.topjava.web;
 
 import org.springframework.web.context.WebApplicationContext;
@@ -45,7 +46,7 @@ public class MealServlet extends HttpServlet {
                 mealController.create(meal);
             } else {
                 mealController.update(meal, getId(request));
-            }
+            };
             response.sendRedirect("meals");
 
         } else if ("filter".equals(action)) {
@@ -89,3 +90,4 @@ public class MealServlet extends HttpServlet {
         return Integer.parseInt(paramId);
     }
 }
+*/
