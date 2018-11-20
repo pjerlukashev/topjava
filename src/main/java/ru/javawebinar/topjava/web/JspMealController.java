@@ -6,11 +6,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import ru.javawebinar.topjava.model.AbstractBaseEntity;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
+import ru.javawebinar.topjava.web.meal.AbstractMealController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
@@ -26,28 +28,28 @@ import static ru.javawebinar.topjava.util.Util.orElse;
 
 @Controller
 @RequestMapping("/meals")
-public class JspMealController {
+public class JspMealController extends AbstractMealController {
 
     @Autowired
-    private MealService mealService;
+    public JspMealController(MealService service) {
+        super(service);
+    }
 
-@GetMapping("")
+    @GetMapping("")
  public String getAll(Model model){
-    int userId = SecurityUtil.authUserId();
-     List<MealTo> mealsWithExcess = MealsUtil.getWithExcess(mealService.getAll(userId), SecurityUtil.authUserCaloriesPerDay());
-model.addAttribute("meals", mealsWithExcess);
+model.addAttribute("meals", super.getAll());
 return "meals";
 }
     @GetMapping("/delete")
  public String delete(HttpServletRequest request){
     int id = getId(request);
-    mealService.delete(id, SecurityUtil.authUserId());
+    super.delete(id);
     return "redirect:/meals";
     }
 
     @GetMapping("/update")
     public String update(HttpServletRequest request, Model model ){
-     Meal meal =  mealService.get(getId(request), SecurityUtil.authUserId() );
+     Meal meal =  service.get(getId(request), SecurityUtil.authUserId() );
      model.addAttribute("meal", meal);
      return "mealForm";
 }
@@ -60,16 +62,18 @@ return "meals";
 }
 
     @PostMapping("/create")
-    public String create( HttpServletRequest request){
+    public String createOrUpdate( HttpServletRequest request){
         Meal meal = new Meal(
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
                 Integer.parseInt(request.getParameter("calories")));
 
         if (request.getParameter("id").isEmpty()) {
-            mealService.create(meal, SecurityUtil.authUserId());
+            super.create(meal);
         } else {
-            mealService.update(meal, SecurityUtil.authUserId());
+            int id = Integer.valueOf(request.getParameter("id"));
+            meal.setId(id);
+           super.update(meal,id );
         }
        return "redirect:/meals";
 }
@@ -80,14 +84,7 @@ return "meals";
         LocalDate endDate = parseLocalDate(request.getParameter("endDate"));
         LocalTime startTime = parseLocalTime(request.getParameter("startTime"));
         LocalTime endTime = parseLocalTime(request.getParameter("endTime"));
-        int userId = SecurityUtil.authUserId();
-
-        List<Meal> mealsDateFiltered = mealService.getBetweenDates(
-                orElse(startDate, DateTimeUtil.MIN_DATE), orElse(endDate, DateTimeUtil.MAX_DATE), userId);
-
-        List<MealTo> mealsWithExcess = MealsUtil.getFilteredWithExcess(mealsDateFiltered, SecurityUtil.authUserCaloriesPerDay(),
-                orElse(startTime, LocalTime.MIN), orElse(endTime, LocalTime.MAX));
-        model.addAttribute("meals", mealsWithExcess);
+        model.addAttribute("meals", super.getBetween(startDate, startTime, endDate, endTime));
         return "meals";
 }
 
