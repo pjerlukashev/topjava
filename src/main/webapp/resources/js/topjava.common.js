@@ -72,14 +72,7 @@ function successNoty(key) {
     }).show();
 }
 
-function failNoty(jqXHR) {
-    closeNoty();
-    failedNote = new Noty({
-        text: "<span class='fa fa-lg fa-exclamation-circle'></span> &nbsp;" + i18n["common.errorStatus"] + ": " + jqXHR.status + (jqXHR.responseJSON ? "<br>" + jqXHR.responseJSON : ""),
-        type: "error",
-        layout: "bottomRight"
-    }).show();
-}
+
 
 function renderEditBtn(data, type, row) {
     if (type === "display") {
@@ -93,24 +86,6 @@ function renderDeleteBtn(data, type, row) {
     }
 }
 
-let failedNote;
-
-function closeNoty() {
-    if (failedNote) {
-        failedNote.close();
-        failedNote = undefined;
-    }
-}
-
-function successNoty(text) {
-    closeNoty();
-    new Noty({
-        text: "<span class='fa fa-lg fa-check'></span> &nbsp;" + text,
-        type: 'success',
-        layout: "bottomRight",
-        timeout: 1000
-    }).show();
-}
 
 function failNoty(jqXHR) {
     closeNoty();
