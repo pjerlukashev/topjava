@@ -51,10 +51,12 @@ $(function () {
                     "asc"
                 ]
             ],
-            "createdRow": function (row, data, dataIndex) {
+            "createdRow": function(row, data, dataIndex) {
                 if (!data.excess) {
                     $(row).attr("data-mealExcess", false);
-                }else{$(row).attr("data-mealExcess", true);}
+                }else {
+                    $(row).attr("data-mealExcess", true);
+                }
             }
         }),
         updateTable: function () {
