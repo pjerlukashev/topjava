@@ -140,13 +140,13 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .with(userHttpBasic(ADMIN))).andExpect(status().isUnprocessableEntity()).andDo(print());
     }
 
-  /*  @Test
+    @Test
     void testCreateWithDuplictedEmail() throws Exception {
         User created = new User(null, "New", "user@yandex.ru", "newPass", 2300, Role.ROLE_USER);
         mockMvc.perform(post(REST_URL )
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(UserTestData.jsonWithPassword(created, "newPass"))
-                .with(userHttpBasic(ADMIN))).andExpect(status().isConflict()).andDo(print());
+                .with(userHttpBasic(ADMIN))).andExpect(status().isUnprocessableEntity()).andDo(print());
     }
 
     @Test
@@ -156,8 +156,10 @@ class AdminRestControllerTest extends AbstractControllerTest {
         mockMvc.perform(put(REST_URL + USER_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(UserTestData.jsonWithPassword(updated, "newPass"))
-                .with(userHttpBasic(ADMIN))).andExpect(status().isConflict()).andDo(print());
+                .with(userHttpBasic(ADMIN))).andExpect(status().isUnprocessableEntity()).andDo(print());
     }
-*/
+
+
+
 
 }

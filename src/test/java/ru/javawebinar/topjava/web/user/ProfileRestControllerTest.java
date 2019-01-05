@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.javawebinar.topjava.TestUtil;
+import ru.javawebinar.topjava.UserTestData;
+import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UserUtil;
@@ -94,4 +96,26 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
     }
+
+    @Test
+    void testUpdateWithDuplicatedEmail() throws Exception {
+        UserTo updatedTo = new UserTo(null, "newName", "admin@gmail.com", "new", 1500);
+
+        mockMvc.perform(put(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(updatedTo))
+                .with(userHttpBasic(USER))).andExpect(status().isUnprocessableEntity()).andDo(print());
+    }
+
+    @Test
+    void testRegisterWithDuplicatedEmail() throws Exception {
+        UserTo createdTo = new UserTo(null, "newName", "user@yandex.ru", "newPassword", 2000);
+
+        mockMvc.perform(post(REST_URL + "/register").contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(createdTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+
 }
