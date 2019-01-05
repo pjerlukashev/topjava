@@ -1,21 +1,38 @@
 package ru.javawebinar.topjava.web;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.support.SessionStatus;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UserUtil;
+import ru.javawebinar.topjava.util.ValidationUtil;
+import ru.javawebinar.topjava.util.exception.ErrorInfo;
+import ru.javawebinar.topjava.util.exception.ErrorType;
 import ru.javawebinar.topjava.web.user.AbstractUserController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Controller
 public class RootController extends AbstractUserController {
+
+    @Autowired
+    UserProfileToValidator userProfileToFormValidator;
+
+    //Set a form validator
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.setValidator(userProfileToFormValidator);
+    }
 
     @GetMapping("/")
     public String root() {
@@ -40,13 +57,13 @@ public class RootController extends AbstractUserController {
     }
 
     @GetMapping("/profile")
-    public String profile() {
-        return "profile";
-    }
+    public String profile() { return "profile"; }
 
     @PostMapping("/profile")
-    public String updateProfile(@Valid UserTo userTo, BindingResult result, SessionStatus status) {
+    public String updateProfile(@Validated UserTo userTo, BindingResult result, SessionStatus status, Model model, HttpServletRequest req) {
         if (result.hasErrors()) {
+            model.addAttribute("errorInfo", new ErrorInfo(req.getRequestURL(), ErrorType.VALIDATION_ERROR, ValidationUtil.getStringErrorResponse(result)));
+          //  model.addAttribute("message", ValidationUtil.getStringErrorResponse(result));
             return "profile";
         } else {
             super.update(userTo, SecurityUtil.authUserId());
@@ -64,9 +81,10 @@ public class RootController extends AbstractUserController {
     }
 
     @PostMapping("/register")
-    public String saveRegister(@Valid UserTo userTo, BindingResult result, SessionStatus status, ModelMap model) {
+    public String saveRegister(@Validated UserTo userTo, BindingResult result, SessionStatus status, ModelMap model, HttpServletRequest req) {
         if (result.hasErrors()) {
             model.addAttribute("register", true);
+            model.addAttribute("errorInfo", new ErrorInfo(req.getRequestURL(), ErrorType.VALIDATION_ERROR, ValidationUtil.getStringErrorResponse(result)));
             return "profile";
         } else {
             super.create(UserUtil.createNewFromTo(userTo));

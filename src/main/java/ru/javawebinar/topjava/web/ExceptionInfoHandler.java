@@ -7,6 +7,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,9 +53,19 @@ public class ExceptionInfoHandler {
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(NotValidDataException.class)
-    public ErrorInfo handleError(HttpServletRequest req, NotValidDataException e){
+    public ErrorInfo notValidDataError(HttpServletRequest req, NotValidDataException e){
         return logAndGetErrorInfo(req, e, true, VALIDATION_ERROR );
     }
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ErrorInfo notValidJsonDataError(HttpServletRequest req, MethodArgumentNotValidException e){
+        BindingResult result = e.getBindingResult();
+        Throwable rootCause = ValidationUtil.getRootCause(e);
+        log.error(VALIDATION_ERROR + " at request " + req.getRequestURL(), rootCause);
+        return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, ValidationUtil.getStringErrorResponse(result));
+    }
+
 
 //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
     private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {

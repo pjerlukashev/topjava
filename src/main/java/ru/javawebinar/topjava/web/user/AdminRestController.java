@@ -1,11 +1,15 @@
 package ru.javawebinar.topjava.web.user;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.javawebinar.topjava.model.User;
+import ru.javawebinar.topjava.web.UserFormValidator;
 
 import java.net.URI;
 import java.util.List;
@@ -14,6 +18,15 @@ import java.util.List;
 @RequestMapping(AdminRestController.REST_URL)
 public class AdminRestController extends AbstractUserController {
     static final String REST_URL = "/rest/admin/users";
+
+    @Autowired
+    UserFormValidator userFormValidator;
+
+    //Set a form validator
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.setValidator(userFormValidator);
+    }
 
     @Override
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -28,7 +41,7 @@ public class AdminRestController extends AbstractUserController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> createWithLocation(@RequestBody User user) {
+    public ResponseEntity<User> createWithLocation(@Validated @RequestBody User user) {
         User created = super.create(user);
 
 //        HttpHeaders httpHeaders = new HttpHeaders();
@@ -51,7 +64,7 @@ public class AdminRestController extends AbstractUserController {
     @Override
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void update(@RequestBody User user, @PathVariable("id") int id) {
+    public void update(@Validated @RequestBody User user, @PathVariable("id") int id) {
         super.update(user, id);
     }
 

@@ -297,6 +297,12 @@
             <version>${jackson-json.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.7</version>
+        </dependency>
+
         <!--Test-->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

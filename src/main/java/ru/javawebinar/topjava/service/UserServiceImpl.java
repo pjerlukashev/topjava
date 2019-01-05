@@ -14,8 +14,10 @@ import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
+import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.util.List;
+import java.util.Objects;
 
 import static ru.javawebinar.topjava.util.UserUtil.prepareToSave;
 import static ru.javawebinar.topjava.util.UserUtil.updateFromTo;
@@ -101,5 +103,52 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User getWithMeals(int id) {
         return checkNotFoundWithId(repository.getWithMeals(id), id);
+    }
+
+    @Override
+    public boolean checkDuplicatingWithEmail( User user) {
+
+        Objects.requireNonNull(user, "the user must not be null" );
+
+        if(user.isNew()){return repository.getByEmail(user.getEmail())== null;}
+        else {
+            User existingUser = repository.getByEmail(user.getEmail());
+            if (existingUser == null) {
+                return true;
+            } else {
+                return existingUser.getId().equals(user.getId());
+            }
+        }
+    }
+
+    @Override
+    public boolean checkDuplicatingWithEmail(UserTo user) {
+
+        Objects.requireNonNull(user, "the userTo must not be null" );
+        if(user.getId()==null){return repository.getByEmail(user.getEmail())== null;}
+        else{    User existingUser = repository.getByEmail(user.getEmail());
+            if (existingUser == null) {
+                return true;
+            } else {
+                return existingUser.getId().equals(user.getId());
+            }
+        }
+    }
+
+    @Override
+    public boolean checkDuplicatingWithEmailRegisteredUser(UserTo user){
+
+        AuthorizedUser authorizedUser = SecurityUtil.safeGet();
+       Integer authUserId = null;
+
+        if(authorizedUser != null){authUserId=authorizedUser.getId();}
+
+        if(authUserId==null){return repository.getByEmail(user.getEmail())== null;}
+        else{  User existingUser = repository.getByEmail(user.getEmail());
+            if (existingUser == null) {
+                return true;
+            } else {
+                return existingUser.getId().equals(authUserId);
+            }}
     }
 }

@@ -4,10 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.javawebinar.topjava.TestUtil;
+import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
-import ru.javawebinar.topjava.web.json.JsonUtil;
+
 
 import java.util.Collections;
 
@@ -89,7 +90,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
         mockMvc.perform(put(REST_URL + USER_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(ADMIN))
-                .content(JsonUtil.writeValue(updated)))
+                .content(UserTestData.jsonWithPassword(updated, "password")))
                 .andExpect(status().isNoContent());
 
         assertMatch(userService.get(USER_ID), updated);
@@ -119,4 +120,44 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(getUserMatcher(ADMIN, USER)));
     }
+
+    @Test
+    void testInvalidUpdateData() throws Exception {
+        User updated = new User(USER);
+        updated.setEmail("hjhjhj");
+        mockMvc.perform(put(REST_URL + USER_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(UserTestData.jsonWithPassword(updated, "password"))
+                .with(userHttpBasic(ADMIN))).andExpect(status().isUnprocessableEntity()).andDo(print());
+    }
+
+    @Test
+    void testInvalidCreateData() throws Exception {
+        User created = new User(null, "New", "newgmail.com", "newPass", 2300, Role.ROLE_USER, Role.ROLE_ADMIN);
+        mockMvc.perform(post(REST_URL )
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(UserTestData.jsonWithPassword(created, "newPass"))
+                .with(userHttpBasic(ADMIN))).andExpect(status().isUnprocessableEntity()).andDo(print());
+    }
+
+  /*  @Test
+    void testCreateWithDuplictedEmail() throws Exception {
+        User created = new User(null, "New", "user@yandex.ru", "newPass", 2300, Role.ROLE_USER);
+        mockMvc.perform(post(REST_URL )
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(UserTestData.jsonWithPassword(created, "newPass"))
+                .with(userHttpBasic(ADMIN))).andExpect(status().isConflict()).andDo(print());
+    }
+
+    @Test
+    void testUpdateWithDuplictedEmail() throws Exception {
+        User updated = new User(USER);
+        updated.setEmail("admin@gmail.com");
+        mockMvc.perform(put(REST_URL + USER_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(UserTestData.jsonWithPassword(updated, "newPass"))
+                .with(userHttpBasic(ADMIN))).andExpect(status().isConflict()).andDo(print());
+    }
+*/
+
 }

@@ -26,4 +26,11 @@ public interface UserService {
     void enable(int id, boolean enable);
 
     User getWithMeals(int id);
+
+    boolean checkDuplicatingWithEmail(User user);
+    boolean checkDuplicatingWithEmail(UserTo user);
+    boolean checkDuplicatingWithEmailRegisteredUser(UserTo user);
+
+
+
 }

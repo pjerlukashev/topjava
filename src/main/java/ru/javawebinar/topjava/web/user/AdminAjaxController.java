@@ -1,23 +1,34 @@
 package ru.javawebinar.topjava.web.user;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UserUtil;
 import ru.javawebinar.topjava.util.ValidationUtil;
 import ru.javawebinar.topjava.util.exception.NotValidDataException;
+import ru.javawebinar.topjava.web.UserToFormValidator;
 
-import javax.validation.Valid;
 import java.util.List;
-import java.util.StringJoiner;
+
 
 @RestController
 @RequestMapping("/ajax/admin/users")
 public class AdminAjaxController extends AbstractUserController {
+
+    @Autowired
+    UserToFormValidator userToFormValidator;
+
+    //Set a form validator
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.setValidator(userToFormValidator);
+    }
 
     @Override
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,7 +50,7 @@ public class AdminAjaxController extends AbstractUserController {
     }
 
     @PostMapping
-    public void createOrUpdate(@Valid UserTo userTo, BindingResult result) {
+    public void createOrUpdate(@Validated UserTo userTo, BindingResult result) {
         if (result.hasErrors()) {
             // TODO change to exception handler
             throw new NotValidDataException(ValidationUtil.getStringErrorResponse(result));
